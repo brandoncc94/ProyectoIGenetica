@@ -1,0 +1,10 @@
+;Read a file to a list of chars
+(define (file->char_list path)
+ (call-with-input-file path
+   (lambda (input-port)
+     (let loop ((x (read-char input-port)))
+       (cond 
+        ((eof-object? x) '())
+        (#t (begin (cons x (loop (read-char input-port))))))))))
+
+(foldr (lambda (x y) (string-append (string x) y)) "" (file->char_list "mydata.txt"))
