@@ -1,6 +1,3 @@
-;Nombre del archivo
-(define nombreArchivo "info.txt")
-
 ;Leer el archivo
 (define (leerArchivo dir)
  (call-with-input-file dir
@@ -10,5 +7,10 @@
         ((eof-object? x) '())
         (#t (begin (cons x (loop (read-char input-port))))))))))
 
-(define info(
-   lambda() (foldr (lambda (x y) (string-append (string x) y)) "" (leerArchivo nombreArchivo))))
+(define info
+  (lambda(nombreArchivo) 
+    (foldr (lambda (x y) (string-append (string x) y)) "" (leerArchivo nombreArchivo))))
+
+(define genetica
+  (lambda(nombreArchivo)
+    (info nombreArchivo)))
