@@ -1,4 +1,7 @@
-;Read a file to a list of chars
+;Nombre del archivo
+(define nombreArchivo "info.txt")
+
+;Leer el archivo
 (define (leerArchivo dir)
  (call-with-input-file dir
    (lambda (input-port)
@@ -6,5 +9,6 @@
        (cond 
         ((eof-object? x) '())
         (#t (begin (cons x (loop (read-char input-port))))))))))
-;GCP
-(foldr (lambda (x y) (string-append (string x) y)) "" (leerArchivo "info.txt"))
+
+(define info(
+   lambda() (foldr (lambda (x y) (string-append (string x) y)) "" (leerArchivo nombreArchivo))))
