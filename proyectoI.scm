@@ -55,15 +55,27 @@
 ;------------------
 ;POBLACIÓN INICIAL
 ;------------------
+(define rand
+  (lambda(pMin pMax)
+    (+ 1 (random pMax))))
+
 (define poblacionInicial
   (lambda(lista)
-    (lista)))
+    (display "Lista: ") (display lista)))
+
+;------------------
+;FUNCION DE FITNESS
+;------------------
+
+;;AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+
+
 ;------------------
 ;FUNCION PRINCIPAL
 ;------------------
 (define genetica
   (lambda(nombreArchivo)
-    (generarLista (info nombreArchivo))))
+    (poblacionInicial (generarLista (info nombreArchivo)))))
 
 
 (define arb
