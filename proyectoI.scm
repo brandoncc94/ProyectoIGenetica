@@ -6,5 +6,5 @@
        (cond 
         ((eof-object? x) '())
         (#t (begin (cons x (loop (read-char input-port))))))))))
-
+;GCP
 (foldr (lambda (x y) (string-append (string x) y)) "" (leerArchivo "info.txt"))
