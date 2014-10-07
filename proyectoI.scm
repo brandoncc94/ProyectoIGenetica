@@ -14,3 +14,25 @@
 (define genetica
   (lambda(nombreArchivo)
     (info nombreArchivo)))
+
+
+
+(define arb
+  '(+
+    (* ()())
+    (/ 
+     (- () (* () ()))
+     (+ () ()))))
+
+(define evaluacion
+  (lambda (X Y arb)
+    (eval (cambioHoja X Y 1 arb))))
+
+(define cambioHoja
+  (lambda (X Y hijo arb)
+    (cond ((null? arb)
+           (cond ((eq? hijo 1) X)
+                 (else Y)))
+          (else
+           (list (car arb) (cambioHoja X Y 1 (cadr arb))
+              (cambioHoja X Y -1 (caddr arb)))))))
