@@ -45,12 +45,7 @@
 ;------------------
 (define genetica
   (lambda(nombreArchivo)
-<<<<<<< HEAD
     (generarLista (info nombreArchivo))))
-=======
-    (info nombreArchivo)))
-
-
 
 (define arb
   '(+
@@ -71,4 +66,3 @@
           (else
            (list (car arb) (cambioHoja X Y 1 (cadr arb))
               (cambioHoja X Y -1 (caddr arb)))))))
->>>>>>> 24ec5e3fab859bad60eebe3c0b79d5ac47dae3f2
