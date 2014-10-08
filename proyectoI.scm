@@ -105,7 +105,40 @@
 ;------------------
 
 ;;AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
+;------------------
+;Funcion de Adaptabilidad
+;------------------
+;Funcion obtener el valor de la funcion
 
+(define promedioFitnnes
+  (lambda (l funciones)
+    (/ (suma (map (evalu l) funciones)) (length funciones)))) 
+
+(define evalu
+  (lambda (l)
+    (lambda (func) (evaluarFuncion l func))))
+
+(define getResult
+  (lambda (l)
+    (caddr l)))
+    
+(define result-l
+  (lambda (l)
+    (suma (map getResult l))))
+
+
+(define evaluarFuncion
+ (lambda (l fun)
+    (abs (- (result-l l) (suma (map (funcion fun) l))))))
+
+(define suma 
+  (lambda (l)
+    (cond ((null? l) 0)
+          (else (+ (car l) (suma (cdr l)))))))
+
+(define funcion
+  (lambda (fun)
+    (lambda (l) (evaluacion (car l) (cadr l) fun))))
 
 ;------------------
 ;FUNCION PRINCIPAL
