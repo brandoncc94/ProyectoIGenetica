@@ -64,7 +64,7 @@
 (define poblacionInicial
   (lambda(lista)
     (display "Lista: ") (display lista) (newline)
-    (funciones-por-arbol (rand 5 15)  ))) 
+    (funciones-por-arbol (rand 5 10)  ))) 
 
 ;Definir cuantas funciones van a haber por cada árbol
 (define funciones-por-arbol
@@ -104,15 +104,49 @@
 ;FUNCION DE FITNESS
 ;------------------
 
-;;AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII
 ;------------------
 ;Funcion de Adaptabilidad
 ;------------------
 ;Funcion obtener el valor de la funcion
+(define aptos
+  (lambda (l funciones apto)
+    (cond ((null? funciones) funciones)
+          ((< (evaluarFuncion l (car funciones)) apto) (cons (car funciones) (aptos l (cdr funciones) apto)))
+          (else (aptos l (cdr funciones) apto)))))
 
-(define promedioFitnnes
+
+(define promedioFitness
   (lambda (l funciones)
     (/ (suma (map (evalu l) funciones)) (length funciones)))) 
+
+;------------------
+;Funcion de Cruce
+;------------------
+(define cruce
+  (lambda (arb1 arb2)
+    (cond ((= (rand 0 1) 0)
+           (cond ((= (rand 0 1) 0)
+                  (list (car arb1) (cadr arb1) (caddr arb2)))
+                 (else (list (car arb1) (cadr arb2) (caddr arb1)))))
+          (else 
+           (cond ((= (rand 0 1) 0)
+                  (list (car arb2) (cadr arb2) (caddr arb1)))
+                 (else (list (car arb2) (cadr arb1) (caddr arb2))))))))
+
+
+;------------------
+;Funcion de Fitness
+;------------------
+
+(define op 
+  (lambda (x y)
+    (abs (- 1.0 (/ x y)))))
+    
+(define Fitness
+  (lambda (l1 l2)
+    (cond ((null? l1) l1 )
+          (else (cons (op (car l1) (car l2)) (Fitness (cdr l1) (cdr l2)))))))
+                 
 
 (define evalu
   (lambda (l)
@@ -129,7 +163,7 @@
 
 (define evaluarFuncion
  (lambda (l fun)
-    (abs (- (result-l l) (suma (map (funcion fun) l))))))
+    (* 100 (suma (Fitness (map (funcion fun) l) (map getResult l))))))
 
 (define suma 
   (lambda (l)
