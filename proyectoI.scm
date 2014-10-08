@@ -55,14 +55,51 @@
 ;------------------
 ;POBLACIÓN INICIAL
 ;------------------
+;Función para obtener un número random en un rango específico
 (define rand
-  (lambda(pMin pMax)
-    (+ 1 (random pMax))))
+  (lambda(min max)
+    (+ min (random(+ 1(- max min))))))
 
+;Crear la población inicial
 (define poblacionInicial
   (lambda(lista)
-    (display "Lista: ") (display lista)))
+    (display "Lista: ") (display lista) (newline)
+    (funciones-por-arbol (rand 5 15)  ))) 
 
+;Definir cuantas funciones van a haber por cada árbol
+(define funciones-por-arbol
+  (lambda(n)
+    (cond((zero? n) '())
+         ((cons (generar-arbol (obtener-funciones (rand 1 5)) '())
+          (funciones-por-arbol (- n 1)))))))
+
+;Lista de funciones
+(define lista-funciones '(+ - * / expt and or))
+
+;Definir cuales funciones van a haber por cada árbol
+(define obtener-funciones
+  (lambda(n)
+    (cond((zero? n) '())
+    (else(cons (list-ref lista-funciones (rand 0 6)) (obtener-funciones (- n 1)))))))
+
+;Generar el árbol para cada función
+(define generar-arbol
+  (lambda(lista arb)
+    (cond((null? lista) arb)
+       (else(generar-arbol (cdr lista) (insertar-arbol arb (car lista)))))))
+
+;Insertar en el árbol, o crearlo en caso de estar vacío
+(define insertar-arbol
+  (lambda (arbol value)
+    (cond
+      ((null? arbol) (list value (append '()) (append '()))) 
+      ((= (rand 0 1) 1)  
+       (list (car arbol)  
+                   (insertar-arbol (cadr arbol) value)
+                   (caddr arbol)))
+      ((list (car arbol)
+                   (cadr arbol)
+                   (insertar-arbol (caddr arbol) value))))))
 ;------------------
 ;FUNCION DE FITNESS
 ;------------------
