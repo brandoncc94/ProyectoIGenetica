@@ -74,13 +74,30 @@
           (funciones-por-arbol (- n 1)))))))
 
 ;Lista de funciones
-(define lista-funciones '(+ - * / expt and or))
+(define lista-funciones '(+ - * / expt bitwise-and bitwise-ior bitwise-xor)) ;PONER XOR
+(define frecuencia '(12 12 12 12 10 14 14 14))
+
+;Verificar valor en rango
+(define freq
+  (lambda(index)
+    (cond((< index 5) (round(* (/ (list-ref frecuencia index) 100.0) 255)))
+         (else(floor(* (/ (list-ref frecuencia index) 100.0) 255))))))
+
+(define in-range
+  (lambda(valor)
+    (in-range-aux valor 0 0 (freq 0) )))
+
+(define in-range-aux
+  (lambda(valor index min max)
+    (cond((> valor 255) -1)
+         ((and (>= valor min) (<= valor max)) index)
+         (else(in-range-aux valor (+ index 1) max (+ max (freq (+ index 1))))))))
 
 ;Definir cuales funciones van a haber por cada árbol
 (define obtener-funciones
   (lambda(n)
     (cond((zero? n) '())
-    (else(cons (list-ref lista-funciones (rand 0 6)) (obtener-funciones (- n 1)))))))
+    (else(cons (list-ref lista-funciones (in-range (rand 0 255))) (obtener-funciones (- n 1)))))))
 
 ;Generar el árbol para cada función
 (define generar-arbol
@@ -180,7 +197,6 @@
 (define genetica
   (lambda(nombreArchivo)
     (poblacionInicial (generarLista (info nombreArchivo)))))
-
 
 (define arb
   '(+
