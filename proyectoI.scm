@@ -128,6 +128,17 @@
           (mut-aux arbol (list-ref lista-funciones (in-range (rand 0 255)))))
          (else arbol ))))
 
+;;MUTACION COMO LA DEL PROFE pero sin implementar en el programa
+(define mut1
+  (lambda (arbol fun n)
+    (cond ((null? arbol) (list fun '() '()))
+          ((= 0 n) (cond ((= 0 (rand 0 1)) (list fun arbol '()))
+                         (else (list fun '() arbol))))
+          (else (cond ((= 0 (rand 0 1)) (list (car arbol) (mut1 (cadr arbol) fun (- n 1)) (caddr arbol)))
+                      (else (list (car arbol) (cadr arbol) (mut1 (caddr arbol) fun (- n 1)))))))))
+
+(define arb1 '(+ (* (/ () ()) (- () ())) (+ (expt (/ () ()) (* (+ () () ) (- () ()))) ())) )
+
 (define mut-aux 
   (lambda (arb fun)
     (cond ((null? arb) (list fun '() '()))
@@ -135,6 +146,15 @@
            (cond ((= (rand 0 1) 0) (list (car arb) (mut-aux (cadr arb) fun) (caddr arb)))
                  (else (list (car arb)  (cadr arb) (mut-aux (caddr arb) fun))))))))
               
+
+
+(define altura
+  (lambda (arb)
+    (cond ((null? arb) -1)
+          (else
+           (+ 1 (max (altura (cadr arb))
+                     (altura (caddr arb))))))))
+
 ;------------------
 ;FUNCION DE FITNESS
 ;------------------
