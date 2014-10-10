@@ -122,6 +122,20 @@
 ;------------------
 
 ;------------------
+;Funcion de Generacion de Poblacion
+;------------------
+(define genPob
+  (lambda (apt larg gen)
+    (cond ((= larg (+  (length apt) (length gen))) (append apt gen))
+          (else (genPob apt larg (cons (genHijo apt) gen))))))
+          
+(define genHijo
+  (lambda (padres)
+    (cruce  (list-ref padres (rand 0 (- (length padres) 1))) (list-ref padres (rand 0 (- (length padres) 1))))))
+    
+    
+
+;------------------
 ;Funcion de Adaptabilidad
 ;------------------
 ;Funcion obtener el valor de la funcion
