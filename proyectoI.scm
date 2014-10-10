@@ -2,12 +2,13 @@
      ;ARCHIVOS
 ;------------------
 ;Leer el archivo
-(define (leerArchivo dir)
- (call-with-input-file dir
-   (lambda (p)
-     (let loop ((x (read-char p)))
-       (cond ((eof-object? x) '())
-        (#t (begin (cons x (loop (read-char p))))))))))
+(define leerArchivo
+ (lambda(dir)
+   (call-with-input-file dir
+     (lambda (p)
+       (let loop ((x (read-char p)))
+         (cond ((eof-object? x) '())
+               (#t (begin (cons x (loop (read-char p)))))))))))
 
 ;Acumula los datos del archivo, que es lo que hace foldr
 (define info
@@ -117,6 +118,23 @@
       ((list (car arbol)
                    (cadr arbol)
                    (insertar-arbol (caddr arbol) value))))))
+
+;------------------
+;MUTACIÓN
+;------------------
+(define mutacion
+  (lambda(arbol)
+    (cond((> (rand 0 100) 95) 
+          (mut-aux arbol (list-ref lista-funciones (in-range (rand 0 255)))))
+         (else arbol ))))
+
+(define mut-aux 
+  (lambda (arb fun)
+    (cond ((null? arb) (list fun '() '()))
+          (else
+           (cond ((= (rand 0 1) 0) (list (car arb) (mut-aux (cadr arb) fun) (caddr arb)))
+                 (else (list (car arb)  (cadr arb) (mut-aux (caddr arb) fun))))))))
+              
 ;------------------
 ;FUNCION DE FITNESS
 ;------------------
