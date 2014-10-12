@@ -61,37 +61,41 @@
   (lambda(min max)
     (+ min (random (+ 1 (- max min))))))
 
+(define rand2
+  (lambda(a b)
+    (cond((zero? (random 2)) a) (else b))))
+
 ;Crear la población inicial
 (define poblacionInicial
   (lambda(lista)
     (display "Lista: ") (display lista) (newline)
-    (funciones-por-arbol (rand 5 10)  ))) 
+    (funciones-por-arbol 50))) 
 
 ;Definir cuantas funciones van a haber por cada árbol
 (define funciones-por-arbol
   (lambda(n)
     (cond((zero? n) '())
-         ((cons (generar-arbol (obtener-funciones (rand 1 5)) '())
+         ((cons (generar-arbol (obtener-funciones (rand 5 15) ) '())
           (funciones-por-arbol (- n 1)))))))
 
 ;Lista de funciones
 (define lista-funciones1 '(+ - * / expt bitwise-and bitwise-ior bitwise-xor)) ;PONER XOR
-(define lista-funciones '(+ - * + expt bit-and bit-or bit-xor)) ;PONER XOR
+(define lista-funciones '(+ - * / bit-xor bit-and bit-or bit-xor)) ;PONER XOR
 
 (define bit-or
   (lambda (x y)
-    (bitwise-ior (inexact->exact x) (inexact->exact y))))
+    (bitwise-ior (inexact->exact (round x)) (inexact->exact (round y)))))
 
 (define bit-and
   (lambda (x y)
-    (bitwise-and (inexact->exact x) (inexact->exact y))))
+    (bitwise-and (inexact->exact (round x)) (inexact->exact (round y)))))
 
 (define bit-xor
   (lambda (x y)
-    (bitwise-xor (inexact->exact x) (inexact->exact y))))
+    (bitwise-xor (inexact->exact (round x)) (inexact->exact (round y)))))
 
 
-(define frecuencia '(12 12 12 12 10 14 14 14))
+(define frecuencia '(12 12 12 12 10 14 14 14)) 
 
 ;Verificar valor en rango
 (define freq
@@ -126,7 +130,7 @@
   (lambda (arbol value)
     (cond
       ((null? arbol) (list value (append '()) (append '()))) 
-      ((= (rand 0 1) 1)  
+      ((= (rand2 0 1) 1)  
        (list (car arbol)  
                    (insertar-arbol (cadr arbol) value)
                    (caddr arbol)))
@@ -139,13 +143,13 @@
 ;------------------
 (define mutacion
   (lambda(arbol)
-    (cond((> (rand 0 100) 95) 
+    (cond((> (rand 0 100) 90) 
           (mut-aux arbol (list-ref lista-funciones (in-range (rand 0 255)))))
          (else arbol ))))
 
 (define muta
   (lambda(arbol)
-    (cond((> (rand 0 100) 95) 
+    (cond((> (rand 0 100) 90) 
           (mut1 arbol (list-ref lista-funciones (in-range (rand 0 255))) (rand 0 (altura arbol))))
          (else arbol ))))
 
@@ -153,16 +157,16 @@
 (define mut1
   (lambda (arbol fun n)
     (cond ((null? arbol) (list fun '() '()))
-          ((= 0 n) (cond ((= 0 (rand 0 1)) (list fun arbol '()))
+          ((= 0 n) (cond ((= 0 (rand2 0 1)) (list fun arbol '()))
                          (else (list fun '() arbol))))
-          (else (cond ((= 0 (rand 0 1)) (list (car arbol) (mut1 (cadr arbol) fun (- n 1)) (caddr arbol)))
+          (else (cond ((= 0 (rand2 0 1)) (list (car arbol) (mut1 (cadr arbol) fun (- n 1)) (caddr arbol)))
                       (else (list (car arbol) (cadr arbol) (mut1 (caddr arbol) fun (- n 1)))))))))
 
 (define mut-aux 
   (lambda (arb fun)
     (cond ((null? arb) (list fun '() '()))
           (else
-           (cond ((= (rand 0 1) 0) (list (car arb) (mut-aux (cadr arb) fun) (caddr arb)))
+           (cond ((= (rand2 0 1) 0) (list (car arb) (mut-aux (cadr arb) fun) (caddr arb)))
                  (else (list (car arb)  (cadr arb) (mut-aux (caddr arb) fun))))))))
               
 
@@ -183,13 +187,23 @@
 ;------------------
 (define genPob
   (lambda (apt larg gen)
-    (cond ((= larg (+  (length apt) (length gen))) (append apt gen))
-          (else (genPob apt larg (cons (genHijo apt) gen))))))
+    (cond ((= larg 1) gen)
+          (else (genPob apt (-  larg 1) (cons (genHijo apt) gen))))))
+
           
 (define genHijo
   (lambda (padres)
     (muta (cruce1 (list-ref padres (rand 0 (- (length padres) 1) )) (list-ref padres (rand 0 (- (length padres) 1)))))))
-    
+
+(define genPob1
+  (lambda (apt)
+    (cond ((= 1 (length apt)) '())
+          (else (append (g-aux (car apt) (cdr apt)) (genPob1 (cdr apt)))))))
+
+(define g-aux
+  (lambda (p1 p2)
+    (cond ((null? p2) p2)
+          (else (cons (cruce1 p1 (car p2)) (g-aux p1 (cdr p2)))))))
     
 
 ;------------------
@@ -202,17 +216,28 @@
           ((<= (evaluarFuncion l (car funciones)) apto) (cons (car funciones) (aptos l (cdr funciones) apto)))
           (else (aptos l (cdr funciones) apto)))))
 
+(define prueba
+  (lambda (l)
+    (list-ref (sort l <) (inexact->exact (floor (+ 0.5 (/ (length l) 2)))))))
+
+(define prueba1
+  (lambda (l cant)
+    (list-ref (sort l <) cant )))
 
 (define promedioFitness
   (lambda (l funciones)
     (/ (suma (map (evalu l) funciones)) (length funciones)))) 
 
+(define elitismo
+  (lambda (pob l)    
+    (list-ref pob (select-opt (cdr (map (evalu l) pob)) (car (map (evalu l) pob)) 0 1))))
+    
 ;------------------
 ;Funcion de Eleccion de Optimo
 ;------------------
 (define optimo?
   (lambda (pob l)
-    (cond ((ormap (lambda(x) (eq? x 0)) (map (evalu l) pob) )
+    (cond ((ormap (lambda(x) (eqv? x 0.0)) (map (evalu l) pob) )
            #true)
           (else
            #false))))
@@ -222,6 +247,11 @@
     (cond ((null? l)  pos)
           ((< (car l) minimo) (select-opt (cdr l) (car l) cont (+ 1 cont)))
           (else (select-opt (cdr l) minimo pos (+ 1 cont))))))
+
+(define (minim lst)
+    (cond ((null? (cdr lst)) (car lst))
+          ((< (car lst) (minim (cdr lst))) (car lst))
+          (else (minim (cdr lst)))))
 
 ;------------------
 ;Funcion de Cruce
@@ -242,14 +272,12 @@
     (cond 
       ((null? arb1) arb2)
       ((null? arb2) arb1)
-      ((= (rand 0 1) 0) (list (car arb1) 
+      ((= (rand2 0 1) 0) (list (car arb1) 
                               (cruce1 (cadr arb1) (cadr arb2))
                               (cruce1 (caddr arb1) (caddr arb2))))
       (else (list (car arb2) 
                               (cruce1 (cadr arb1) (cadr arb2))
                               (cruce1 (caddr arb1) (caddr arb2)))))))
-
-
 
 
 ;------------------
@@ -263,7 +291,7 @@
 
 (define convertDecimal 
   (lambda (x y)
-    (abs (- 1.0 (/ x y)))))
+    (abs (- 1.0 (/ x y))))) 
     
 
 (define evaluacion
@@ -286,7 +314,15 @@
 
 (define evaluarFuncion
  (lambda (l fun)
-    (* 100 (suma (Fitness (map (funcion fun) l) (map getResult l))))))
+   (with-handlers ([exn:fail? (lambda (v) #f)])
+    (* 100 (suma (Fitness (map (funcion fun) l) (map getResult l)))))))
+
+(define filtrar
+  (lambda (l pob flag pob1)
+    (cond ((null? pob) (cond ((= flag 1) (filtrar l pob1 0 '()))
+                             (else pob1)))
+          ((eq? #f (evaluarFuncion l (car pob)))  (filtrar l (cdr pob) 1 (cons (generar-arbol (obtener-funciones 5) '()) pob1)))
+          (else (filtrar l (cdr pob) flag (cons (car pob) pob1))))))
 
 (define suma 
   (lambda (l)
@@ -306,14 +342,22 @@
 
 (define genetica1
   (lambda (nombreArchivo)
-    (gen-aux (poblacionInicial (generarLista (info nombreArchivo))) (generarLista (info nombreArchivo)) 0 200)))
+    (gen-aux (filtrar (generarLista (info nombreArchivo)) (poblacionInicial (generarLista (info nombreArchivo))) 0 '()) 
+             (generarLista (info nombreArchivo)) 0 50)))
+
 
 (define gen-aux
   (lambda (pob lis countGen maxGen)
     (cond ((optimo? pob lis) (display 'optimo) (list-ref pob (select-opt (cdr (map (evalu lis) pob)) (car (map (evalu lis) pob)) 0 1)))
           ((= countGen maxGen) (display 'maxGen) (list-ref pob (select-opt (cdr (map (evalu lis) pob)) (car (map (evalu lis) pob)) 0 1)))
-          (else (
-                 gen-aux (genPob (aptos lis pob (promedioFitness lis pob))  (length pob) '()  )  lis (+ 1 countGen) maxGen)))))
+          (else 
+           (newline)
+           (display countGen)
+           (newline)
+           (display (prueba (map (evalu lis) pob)))
+           (newline)
+                 (gen-aux (cons (elitismo pob lis) (filtrar lis (genPob (aptos lis pob (prueba (map (evalu lis) pob))) (length pob) '()) 0 '()))
+                                                      lis (+ 1 countGen) maxGen)))))
 
 
 ;-----------------------------------------------------------
@@ -336,11 +380,9 @@
 
 (define funcionFinal 
   (lambda (fun)
-    (lambda (X Y) (evaluacion X Y arb))))
+    (lambda (X Y) (evaluacion X Y fun))))
 
-
-
-(define arb '(+ (* ()()) (/ (- () (* () ())) (+ () ()))))
-(define arb1 '(+ (* (/ () ()) (- () ())) (+ (expt (/ () ()) (* (+ () () ) (- () ()))) ())) )
-(define l (generarLista (info "info.txt")))
-(define pob (genetica "info.txt"))
+;(define arb '(+ (* ()()) (/ (- () (* () ())) (+ () ()))))
+;(define arb1 '(+ (* (/ () ()) (- () ())) (+ (expt (/ () ()) (* (+ () () ) (- () ()))) ())) )
+(define l1 (generarLista (info "info.txt")))
+;(define pobla (genetica "info.txt"))
